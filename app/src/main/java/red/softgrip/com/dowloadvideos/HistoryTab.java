@@ -4,112 +4,137 @@ package red.softgrip.com.dowloadvideos;
  * Created by Qaiser Pasha on 9/24/2018.
  */
 
-import android.content.Context;
-import android.content.Intent;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
+
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.Toolbar;
+import android.widget.Toast;
 
-import static android.content.Context.LAYOUT_INFLATER_SERVICE;
+import java.util.ArrayList;
 
 public class HistoryTab  extends Fragment {
 
 
-    GridView Grid;
-    GRIDAdapter adapter;
-
+    Adapter_VideoFolder obj_adapter;
+    ArrayList<Model_Video> al_video = new ArrayList<>();
+    RecyclerView recyclerView;
+    RecyclerView.LayoutManager recyclerViewLayoutManager;
+    private static final int REQUEST_PERMISSIONS = 100;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootview = inflater.inflate(R.layout.fragment_history, container, false);
-//        Toolbar toolbar = (Toolbar)rootview.findViewById(R.id.toolbar);
-////        setSupportActionBar(toolbar);
 
-        final Integer[] image = new Integer[]{R.drawable.image1, R.drawable.image2, R.drawable.image3,
-                R.drawable.image4, R.drawable.image5, R.drawable.image6,
-                R.drawable.image7, R.drawable.image8};
 
-        Grid = (GridView)rootview.findViewById(R.id.MyGrid);
-        adapter = new GRIDAdapter(getContext(), R.layout.grid_item, image);
 
-        Grid.setAdapter(adapter);
-        Grid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                Intent go = new Intent(getContext(), Details.class);
-                go.putExtra("image", image[position]);
-                //By position Clicked
-                startActivity(go);
-            }
-        });
 
-        return rootview;
+
+        init();
+        return  rootview;
     }
 
-    public class GRIDAdapter extends ArrayAdapter {
-        private Integer[] Image;
-        private int resource;
-        private LayoutInflater inflater;
 
-        public GRIDAdapter(Context context, int resource, Integer[] image) {
-            super(context, resource, image);
-            Image = image;
-            this.resource = resource;
-            inflater = (LayoutInflater)getContext().getSystemService(LAYOUT_INFLATER_SERVICE);
-        }
+    private void init(){
 
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+//        recyclerView = (RecyclerView)rootview.findViewById(R.id.recycler_view1);
+        recyclerViewLayoutManager = new GridLayoutManager(getContext(), 2);
+        recyclerView.setLayoutManager(recyclerViewLayoutManager);
 
-            ViewHolder Holder = null;
+        fn_checkpermission();
 
-            if (convertView == null) {
-                Holder = new ViewHolder();
-                convertView = inflater.inflate(resource, null);
-                Holder.IMAGE = (ImageView) convertView.findViewById(R.id.imageID);
-                convertView.setTag(Holder);
+    }
+    private void fn_checkpermission(){
+        /*RUN TIME PERMISSIONS*/
+
+        if ((ContextCompat.checkSelfPermission(getContext(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) && (ContextCompat.checkSelfPermission(getContext(),
+                Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)) {
+            if ((ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) && (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
+                    Manifest.permission.READ_EXTERNAL_STORAGE))) {
+
             } else {
-                Holder = (ViewHolder)convertView.getTag();
+                ActivityCompat.requestPermissions(getActivity(),
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
+                        REQUEST_PERMISSIONS);
             }
-            Holder.IMAGE.setImageResource(Image[position]);
-            Holder.IMAGE.setScaleType(ImageView.ScaleType.CENTER_CROP);
-
-            return convertView;
-        }
-
-        class ViewHolder {
-            private ImageView IMAGE;
+        }else {
+            Log.e("Else","Else");
+            fn_video();
         }
     }
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu_main, menu);
-//        return true;
-//    }
+
+    public void fn_video() {
+
+        int int_position = 0;
+        Uri uri;
+        Cursor cursor;
+        int column_index_data, column_index_folder_name,column_id,thum;
+
+        String absolutePathOfImage = null;
+        uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+
+        String[] projection = {MediaStore.MediaColumns.DATA, MediaStore.Video.Media.BUCKET_DISPLAY_NAME,MediaStore.Video.Media._ID,MediaStore.Video.Thumbnails.DATA};
+
+        final String orderBy = MediaStore.Images.Media.DATE_TAKEN;
+        cursor = getContext().getContentResolver().query(uri, projection, null, null, orderBy + " DESC");
+
+        column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+        column_index_folder_name = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.BUCKET_DISPLAY_NAME);
+        column_id = cursor.getColumnIndexOrThrow(MediaStore.Video.Media._ID);
+        thum = cursor.getColumnIndexOrThrow(MediaStore.Video.Thumbnails.DATA);
+
+        while (cursor.moveToNext()) {
+            absolutePathOfImage = cursor.getString(column_index_data);
+            Log.e("Column", absolutePathOfImage);
+            Log.e("Folder", cursor.getString(column_index_folder_name));
+            Log.e("column_id", cursor.getString(column_id));
+            Log.e("thum", cursor.getString(thum));
+
+            Model_Video obj_model = new Model_Video();
+            obj_model.setBoolean_selected(false);
+            obj_model.setStr_path(absolutePathOfImage);
+            obj_model.setStr_thumb(cursor.getString(thum));
+
+            al_video.add(obj_model);
+
+        }
+
+
+        obj_adapter = new Adapter_VideoFolder(getContext(),al_video,getActivity());
+        recyclerView.setAdapter(obj_adapter);
+
+    }
+
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (requestCode) {
+            case REQUEST_PERMISSIONS: {
+                for (int i = 0; i < grantResults.length; i++) {
+                    if (grantResults.length > 0 && grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                        fn_video();
+                    } else {
+                        Toast.makeText(getActivity(), "The app was not allowed to read or write to your storage. Hence, it cannot function properly. Please consider granting it this permission", Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
         }
-
-        return super.onOptionsItemSelected(item);
     }
+
 }

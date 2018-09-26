@@ -51,7 +51,7 @@ public class DownloadTab  extends Fragment implements EasyPermissions.Permission
     String abc;
     Elements metaTags;
 
-
+    String absoluteUrl,srcValue;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -74,8 +74,14 @@ public class DownloadTab  extends Fragment implements EasyPermissions.Permission
                     if (EasyPermissions.hasPermissions(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                         //Get the URL entered
 
-//                        Content content=new Content();
-//                                content.execute();
+                        Content content=new Content();
+                                content.execute();
+
+
+
+
+
+
                         progressDialog.show();
 
 
@@ -185,7 +191,7 @@ public class DownloadTab  extends Fragment implements EasyPermissions.Permission
                 fileName = timestamp + "_" + fileName+".mp4";
 
                 //External directory path to save file
-                folder = Environment.getExternalStorageDirectory() + File.separator + "MusicallyDownloader/";
+                folder = Environment.getExternalStorageDirectory() + File.separator +"MusicallyDownloader/";
 
                 //Create androiddeft folder if it does not exist
                 File directory = new File(folder);
@@ -250,6 +256,9 @@ public class DownloadTab  extends Fragment implements EasyPermissions.Permission
         }
     }
 
+
+
+
     private class Content extends AsyncTask<Void, Void, Void>
     {
 
@@ -268,12 +277,13 @@ public class DownloadTab  extends Fragment implements EasyPermissions.Permission
             // textView.setText(metaTags.text());
 
 //            progressDialog.dismiss();
-            Toast.makeText(getActivity(), ""+abc, Toast.LENGTH_SHORT).show();
-                String finalvalue="https:"+abc;
+            Toast.makeText(getActivity(), "value :"+absoluteUrl, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "result :"+srcValue, Toast.LENGTH_SHORT).show();
+             //   String finalvalue="https:"+abc;
 //                                    url = editTextUrl.getText().toString();
-                        new DownloadFile().execute(finalvalue);
+                    //    new DownloadFile().execute(finalvalue);
 
-                        progressDialog.dismiss();
+//                        progressDialog.dismiss();
 
 
         }
@@ -291,17 +301,43 @@ public class DownloadTab  extends Fragment implements EasyPermissions.Permission
 
 
             try {
-                Document document = Jsoup.connect("http://vm.tiktok.com/Kk3X7/").get();
+
+
+
+
+
+                Document document = Jsoup.connect("http://vm.tiktok.com/KVyHr/").get();
+
+                Element div1 = document.getElementById("jp_video_0");
+                System.out.println("\nlinkwww: " + div1.attr("src"));
+
+
+
+
 //                title=document.title();
-                metaTags = document.select("meta");
-                //  System.out.println(metaTags);
-                Element descriptionMetaTag = document.select("meta[property=og:video:url]").first();
+//                Element link = document.select("video").first();
+//
+//                String text = document.body().text(); // "An example link"
+//                String linkHref = link.attr("src"); // "http://example.com/"
+//                String linkText = link.text();
+//                System.out.println("abc : " +linkText);
+//                Element imageElement = document.select("img").first();
+//
+//                 absoluteUrl = imageElement.absUrl("src");  //absolute URL on src
+//
+//                 srcValue = imageElement.attr("src");
+//                System.out.println("content : " +absoluteUrl);
 
-                //  System.out.println(descriptionMetaTag);
 
-                // Get content of the above description meta tag
-                abc=descriptionMetaTag.attr("content");
-                System.out.println("content : " + descriptionMetaTag.attr("content"));
+//                metaTags = document.select("meta");
+//                //  System.out.println(metaTags);
+//                Element descriptionMetaTag = document.select("meta[property=og:video:url]").first();
+//
+//                //  System.out.println(descriptionMetaTag);
+//
+//                // Get content of the above description meta tag
+//                abc=descriptionMetaTag.attr("content");
+//                System.out.println("content : " + descriptionMetaTag.attr("content"));
 
             } catch (IOException e) {
                 e.printStackTrace();

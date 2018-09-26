@@ -7,9 +7,14 @@
     android:background="#FFC300"
     android:orientation="vertical">
 
-
-    <include layout="@layout/content_main" />
-
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:scrollbars="vertical">
+    </android.support.v7.widget.RecyclerView>
 
 
 </LinearLayout>
