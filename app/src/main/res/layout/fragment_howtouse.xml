@@ -4,7 +4,7 @@
     android:id="@+id/constraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1e084d"
+    android:background="#FFC300"
     android:weightSum="2"
     android:gravity="center"
     android:orientation="vertical">

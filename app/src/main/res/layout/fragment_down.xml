@@ -4,7 +4,7 @@
     android:id="@+id/constraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1e084d"
+    android:background="#FFC300"
     android:weightSum="2"
     android:orientation="vertical">
     <LinearLayout
@@ -20,15 +20,18 @@
             android:layout_height="40dp"
             android:layout_weight="1.7"
             android:focusable="false"
+            android:id="@+id/et_URL"
             android:background="@drawable/shape_edit_text"/>
         <View
-            android:layout_width="3dp"
+            android:layout_width="6dp"
             android:layout_height="1dp"/>
         <Button
             android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:layout_weight="0.25"
-            android:background="@drawable/btn_search"/>
+            android:layout_height="55dp"
+            android:layout_weight="0.27"
+            android:id="@+id/btn_down"
+            android:layout_marginBottom="7dp"
+            android:background="@drawable/ic_down"/>
     </LinearLayout>
 
 
